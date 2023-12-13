@@ -21,21 +21,28 @@
 
 
         <section class="foot">
-            <mt-field id="txtContent" placeholder="请输入消息" class="con" v-model="content"></mt-field>
+            <mt-field id="txtContent" placeholder="Please enter messages" class="con" v-model="content"></mt-field>
             <span class="btn-face" v-on:click="showSelBox=showSelBox==1?0:1"><i class="fa fa-smile-o" aria-hidden="true"></i></span>
             <span class="btn-plus" v-on:click="showSelBox=showSelBox==2?0:2"><i class="fa" aria-hidden="true" :class="showSelBox==2?'fa-minus-circle':'fa-plus-circle'"></i></span>
-            <span class="btn btn-send" v-on:click="sendMsg">发送</span>
+            <span class="btn btn-send" v-on:click="sendMsg">Send</span>
             <section class="selbox" :class="showSelBox>0?'show':'hide'">
                 <section v-show="showSelBox==1" class="face-box">
                     <mt-swipe :auto="0" :continuous="false">
                         <mt-swipe-item v-for="n in Math.ceil(EXPS.length/18)">
-                            <li v-for="(item, index) in getEXP(n,18)">
-                                <img :src="'static/emotion/'+item.file" alt="" :data="item.code" v-on:click="content+=item.code">
-                            </li>
+                            <ul>
+                                <li v-for="(item, index) in getEXP(n,18)">
+                                    <img :id="index" :src="'static/emotion/'+item.file" alt="" :data="item.code" v-on:click="content+=item.code">
+                                </li>
+                            </ul>
                         </mt-swipe-item>
                     </mt-swipe>
                 </section>
-                <div v-show="showSelBox==2">{{selOther}}</div>
+                <div v-show="showSelBox==2">
+                    <span>
+                        <button class="file-btn" @click="uploadFiles">Upload Files</button>
+                        <input v-show="false" type="file" name="file" ref="fileRef" @change="fileSelected">
+                    </span>
+                </div>
             </section>
         </section>
 
@@ -56,18 +63,21 @@ export default {
             selOther: '其他功能',
             content:'',
             topStatus: '',
+            selectedFile: null,
             //聊天记录
-            records: [{
-                type: 1,
-                time: util.formatDate.format(new Date(),'yyyy-MM-dd hh:mm:ss'),
-                name: '游客',
-                content: '你好！'
-            }, {
-                type: 2,
-                time: util.formatDate.format(new Date(),'yyyy-MM-dd hh:mm:ss'),
-                name: '客户MM',
-                content: '这里是<a target="_blank" href="https://github.com/taylorchen709/vue-chat">源码</a>'
-            }],
+            records: [],
+            // [{
+            //     type: 1,
+            //     time: util.formatDate.format(new Date(),'yyyy-MM-dd hh:mm:ss'),
+            //     name: 'VIP',
+            //     content: 'Hi!'
+            // }, {
+            //     type: 2,
+            //     time: util.formatDate.format(new Date(),'yyyy-MM-dd hh:mm:ss'),
+            //     name: 'ChatGPT',
+            //     content: 'Hello!'
+            //     // content: '这里是<a target="_blank" href="">源码</a>'
+            // }],
             // 表情
             EXPS: [
                 { file: '100.gif', code: '/::)', title: '微笑',reg:/\/::\)/g },
@@ -174,6 +184,38 @@ export default {
         }
     },
     methods: {
+
+        fileSelected(event) {
+            let _this=this;
+            this.selectedFile = event.target.files[0];
+            console.log('file: ',this.selectedFile);
+            this.records.push(
+                {
+                    type: 1,
+                    time: util.formatDate.format(new Date(),'yyyy-MM-dd hh:mm:ss'),
+                    name: 'VIP',
+                    content: this.selectedFile.name
+                },
+            );
+
+            setTimeout(function(){
+                _this.records.push({
+                    type: 2,
+                    time: util.formatDate.format(new Date(),'yyyy-MM-dd hh:mm:ss'),
+                    name: 'ChatGPT',
+                    content: "File received. You can ask questions about it!"
+                });
+            },1000);
+
+        },
+
+        uploadFiles: function () {
+            this.$refs.fileRef.click();
+        },
+
+        updatefiles:()=>{
+        },
+
         getEXP: function (pageNow,pageSize) {
             return this.EXPS.slice((pageNow - 1) * pageSize, pageSize * pageNow)
         },
@@ -182,25 +224,25 @@ export default {
             var _this=this;
 
             if(this.content==''){
-                Toast('请输入消息');
+                Toast('Please enter messages');
                 return;
             }
 
             this.records.push({
                 type: 1,
                 time: util.formatDate.format(new Date(),'yyyy-MM-dd hh:mm:ss'),
-                name: '游客',
+                name: 'VIP',
                 content: this.content
             });
 
-            setTimeout(function(){
-                _this.records.push({
-                    type: 2,
-                    time: util.formatDate.format(new Date(),'yyyy-MM-dd hh:mm:ss'),
-                    name: '客服MM',
-                    content: '你好！'
-                });
-            },100);
+            // setTimeout(function(){
+            //     _this.records.push({
+            //         type: 2,
+            //         time: util.formatDate.format(new Date(),'yyyy-MM-dd hh:mm:ss'),
+            //         name: 'ChatGPT',
+            //         content: 'Hello!'
+            //     });
+            // },100);
 
             this.content='';
 
@@ -241,13 +283,14 @@ export default {
                 _this.records.unshift({
                     type: 1,
                     time: util.formatDate.format(new Date(),'yyyy-MM-dd hh:mm:ss'),
-                    name: '游客',
-                    content: '你好！13213'
+                    name: 'VIP',
+                    content: 'hi???loadTop'
                 }, {
                     type: 2,
                     time: util.formatDate.format(new Date(),'yyyy-MM-dd hh:mm:ss'),
-                    name: '客户MM',
-                    content: '这里是<a target="_blank" href="https://github.com/taylorchen709/vue-chat">源码</a>13213'
+                    name: 'ChatGPT',
+                    content: 'loadTop'
+                    // content: '这里是<a target="_blank" href="https://github.com/taylorchen709/vue-chat">源码</a>13213'
                 });
 
                 setTimeout(function(){
@@ -271,6 +314,20 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
+    .file-btn{
+        width: 110px;       /* 宽度设置为25px */
+        height: 40px;      /* 高度设置为25px */
+        border-radius: 3px; /* 圆角半径设置为50%，使其成为圆形 */
+        border: 5px;      /* 移除边框 */
+        margin: 10px;           /* 周围留出10px的空间 */
+        font-size: 16px;        /* 设置文本大小为18px */
+        /* 可以根据需要添加背景色、文本颜色等 */
+        background-color: #33DF83; /* 示例背景色 */
+        color: white;           /* 示例文本颜色 */
+        padding: 0;             /* 移除内边距 */
+        outline: none;          /* 移除焦点时的轮廓 */
+        cursor: pointer;        /* 鼠标悬停时的指针样式 */
+    }
     .chatlist {
         position: absolute;
         top: 60px;
@@ -413,11 +470,14 @@ export default {
     }
     
     .foot {
-        width: 100%;
+        width: 90%;
         min-height: 48px;
         position: fixed;
-        bottom: 0px;
-        left: 0px;
+        bottom: 1%;
+        left: 0;
+        right: 0;
+        margin-left: auto;
+        margin-right: auto;
         background-color: #F8F8F8;
     }
     

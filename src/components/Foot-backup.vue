@@ -1,6 +1,6 @@
 <template>
   <section class="foot">
-    <mt-field placeholder="请输入消息" class="con"></mt-field>
+    <mt-field placeholder="Please enter message" class="con"></mt-field>
     <span class="btn-face" v-on:click="showSelBox=showSelBox==1?0:1"><i class="fa fa-smile-o" aria-hidden="true"></i></span>
     <span class="btn-plus" v-on:click="showSelBox=showSelBox==2?0:2"><i class="fa" aria-hidden="true" :class="showSelBox==2?'fa-minus-circle':'fa-plus-circle'"></i></span>
     <section class="selbox" :class="showSelBox>0?'show':'hide'">
